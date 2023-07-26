@@ -5,11 +5,7 @@
         <group>
             <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/PanelCRUD/AgregarJPanel.java</file>
             <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/PanelCRUD/ConsulatJPanel.java</file>
-            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/PanelCRUD/ActualizarJPanel.java</file>
-            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/PanelCRUD/EliminarJPanel.java</file>
-            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/MainJFrame.java</file>
-            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Vistas/BienvenidaJPanel.java</file>
-            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/aplicationclient/AplicationClient.java</file>
+            <file>file:/C:/Users/ReR-7/Documents/NetBeansProjects/AplicationClient/src/Clases/ClienteWS.java</file>
         </group>
     </open-files>
 </project-private>
