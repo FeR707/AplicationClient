@@ -5,6 +5,19 @@
  */
 package Vistas.PanelCRUD;
 
+import Clases.Alumno;
+import Clases.ClienteWS;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import org.json.JSONException;
+
 /**
  *
  * @author ReR-7
@@ -15,7 +28,73 @@ public class ActualizarJPanel extends javax.swing.JPanel {
      * Creates new form ActualizarJPanel
      */
     public ActualizarJPanel() {
-        initComponents();
+        initComponents(); 
+        initializeJComboBox(); 
+        // Agregar un ComponentListener al JPanel
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                ObtenerRegistros();
+            }
+        });
+    }
+
+    private void initializeJComboBox() {
+        // Configuración del JComboBox
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
+        jcbMatriculas.setModel(comboBoxModel);
+
+        // Configurar ActionListener para manejar los eventos de selección en el JComboBox
+        jcbMatriculas.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String matriculaSeleccionada = (String) jcbMatriculas.getSelectedItem();
+                    ClienteWS peticionHTTP = new ClienteWS();
+
+                    // Supongo que el método MetodoGetm devuelve una lista de objetos Alumno
+                    List<Alumno> alumnosConsultados = peticionHTTP.MetodoGetm(matriculaSeleccionada);
+
+                    // Asegúrate de que la lista no esté vacía antes de actualizar los campos de texto
+                    if (!alumnosConsultados.isEmpty()) {
+                        Alumno alumnoSeleccionado = alumnosConsultados.get(0);
+
+                        // Actualiza los campos de texto con los datos del alumno seleccionado
+                        txtNombre.setText(alumnoSeleccionado.getNombre());
+                        txtPaterno.setText(alumnoSeleccionado.getaPaterno());
+                        txtMaterno.setText(alumnoSeleccionado.getaMaterno());
+                        txtEdad.setText(alumnoSeleccionado.getEdad());
+                        txtGrupo.setText(alumnoSeleccionado.getGrupo());
+                        txtTelefono.setText(alumnoSeleccionado.getTelefono());
+                        txtCorreo.setText(alumnoSeleccionado.getCorreo());
+                        txtCuatri.setText(alumnoSeleccionado.getCuatrimestre());
+                        txtPromedio.setText(alumnoSeleccionado.getPromedio());
+                    }
+                } catch (JSONException ex) {
+                    Logger.getLogger(ActualizarJPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    private void ObtenerRegistros() {
+        ClienteWS peticionHTTP = new ClienteWS();
+        try {
+            // Supongo que el método MetodoConsulta devuelve una lista de objetos Alumno
+            List<Alumno> alumnosConsultados = peticionHTTP.MetodoConsulta();
+
+            // Obtener el modelo del JComboBox
+            DefaultComboBoxModel<String> comboBoxModel = (DefaultComboBoxModel<String>) jcbMatriculas.getModel();
+
+            // Limpiar el contenido actual del JComboBox
+            comboBoxModel.removeAllElements();
+
+            // Agregar las matrículas consultadas al JComboBox
+            for (Alumno alumno : alumnosConsultados) {
+                comboBoxModel.addElement(alumno.getMatricula());
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(ConsulatJPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -46,11 +125,11 @@ public class ActualizarJPanel extends javax.swing.JPanel {
         lblPromedio = new javax.swing.JLabel();
         txtPaterno = new javax.swing.JTextField();
         lblEdad = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jcbMatriculas = new javax.swing.JComboBox<>();
         lblSelect = new javax.swing.JLabel();
         btnActualizar = new javax.swing.JButton();
 
-        setBackground(new java.awt.Color(255, 204, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
 
         lblActualizar.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         lblActualizar.setForeground(new java.awt.Color(0, 0, 0));
@@ -113,7 +192,7 @@ public class ActualizarJPanel extends javax.swing.JPanel {
         lblEdad.setForeground(new java.awt.Color(0, 0, 0));
         lblEdad.setText("Edad:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbMatriculas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         lblSelect.setForeground(new java.awt.Color(0, 0, 0));
         lblSelect.setText("Seleccione la matricula");
@@ -158,7 +237,7 @@ public class ActualizarJPanel extends javax.swing.JPanel {
                         .addComponent(txtEdad, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(31, 31, 31)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jcbMatriculas, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
                                 .addComponent(lblSelect))
@@ -199,11 +278,11 @@ public class ActualizarJPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(42, 42, 42)
                 .addComponent(lblActualizar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addGap(32, 32, 32)
                 .addComponent(lblSelect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
+                .addComponent(jcbMatriculas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMaterno)
@@ -276,14 +355,37 @@ public class ActualizarJPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtPromedioKeyTyped
 
+
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        // TODO add your handling code here:
+        String matriculaSeleccionada = (String) jcbMatriculas.getSelectedItem();
+        ClienteWS peticionHTTP = new ClienteWS();
+        Alumno AgregarAlumno = new Alumno();
+        AgregarAlumno.setNombre(txtNombre.getText());
+        AgregarAlumno.setaPaterno(txtPaterno.getText());
+        AgregarAlumno.setaMaterno(txtMaterno.getText());
+        AgregarAlumno.setMatricula(matriculaSeleccionada);
+        AgregarAlumno.setEdad(txtEdad.getText());
+        AgregarAlumno.setGrupo(txtGrupo.getText());
+        AgregarAlumno.setTelefono(txtTelefono.getText());
+        AgregarAlumno.setCorreo(txtCorreo.getText());
+        AgregarAlumno.setCuatrimestre(txtCuatri.getText());
+        AgregarAlumno.setPromedio(txtPromedio.getText());
+
+        boolean exito = peticionHTTP.MetodoPut(AgregarAlumno);
+
+        if (exito) {
+            // Si el método fue exitoso (true), muestra un mensaje de éxito
+            JOptionPane.showMessageDialog(this, "El alumno con matrícula " + matriculaSeleccionada + " ha sido actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Si el método no fue exitoso (false), muestra un mensaje de error
+            JOptionPane.showMessageDialog(this, "No se pudo actualizar el alumno con matrícula " + matriculaSeleccionada + ".", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnActualizarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jcbMatriculas;
     private javax.swing.JLabel lblActualizar;
     private javax.swing.JLabel lblCorreo;
     private javax.swing.JLabel lblCuatri;

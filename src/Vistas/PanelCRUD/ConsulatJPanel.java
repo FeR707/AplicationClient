@@ -6,6 +6,14 @@
 package Vistas.PanelCRUD;
 
 import javax.swing.table.DefaultTableModel;
+import Clases.ClienteWS;
+import Clases.Alumno;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONException;
 
 /**
  *
@@ -14,12 +22,13 @@ import javax.swing.table.DefaultTableModel;
 public class ConsulatJPanel extends javax.swing.JPanel {
 
     DefaultTableModel modelo;
+
     /**
      * Creates new form ConsulatJPanel
      */
     public ConsulatJPanel() {
         initComponents();
-        modelo= new DefaultTableModel();
+        modelo = new DefaultTableModel();
         modelo.addColumn("Matricula");
         modelo.addColumn("Nombre");
         modelo.addColumn("A. Paterno");
@@ -31,7 +40,44 @@ public class ConsulatJPanel extends javax.swing.JPanel {
         modelo.addColumn("Cuatrimestre");
         modelo.addColumn("Promedio");
         this.TableAlumnos.setModel(modelo);
-        
+
+        // Agregar un ComponentListener al JPanel
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                DefaultTableModel modelo = (DefaultTableModel) TableAlumnos.getModel();
+                modelo.setRowCount(0);
+                ObtenerRegistros();
+            }
+        });
+    }
+
+    private void ObtenerRegistros() {
+        ClienteWS peticionHTTP = new ClienteWS();
+        try {
+            // Supongo que el método MetodoGetm devuelve una lista de objetos Alumno
+            List<Alumno> alumnosConsultados = peticionHTTP.MetodoConsulta();
+
+            // A continuación, puedes hacer lo que necesites con la lista de alumnos consultados
+            // Por ejemplo, si quieres agregarlos a la tabla, puedes hacerlo mediante el modelo de datos
+            DefaultTableModel modeloTabla = (DefaultTableModel) TableAlumnos.getModel();
+            for (Alumno alumno : alumnosConsultados) {
+                modeloTabla.addRow(new Object[]{
+                    alumno.getMatricula(),
+                    alumno.getNombre(),
+                    alumno.getaPaterno(),
+                    alumno.getaMaterno(),
+                    alumno.getEdad(),
+                    alumno.getGrupo(),
+                    alumno.getTelefono(),
+                    alumno.getCorreo(),
+                    alumno.getCuatrimestre(),
+                    alumno.getPromedio()
+                });
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(ConsulatJPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -48,8 +94,9 @@ public class ConsulatJPanel extends javax.swing.JPanel {
         TableAlumnos = new javax.swing.JTable();
         txtMatricula = new javax.swing.JTextField();
         btnConsultar = new javax.swing.JButton();
+        lblBuscaMatricula = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 255, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(500, 550));
 
         lblConsuta.setBackground(new java.awt.Color(255, 255, 255));
@@ -67,47 +114,89 @@ public class ConsulatJPanel extends javax.swing.JPanel {
         jScrollPane2.setViewportView(TableAlumnos);
 
         btnConsultar.setText("Consultar");
+        btnConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultarActionPerformed(evt);
+            }
+        });
+
+        lblBuscaMatricula.setText("Ingrese la matricula a buscar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 533, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(137, 137, 137)
+                        .addComponent(txtMatricula, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)
+                        .addComponent(btnConsultar))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(194, 194, 194)
                         .addComponent(lblConsuta))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(101, 101, 101)
-                        .addComponent(txtMatricula, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(63, 63, 63)
-                        .addComponent(btnConsultar)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(15, 15, 15)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(159, 159, 159)
+                        .addComponent(lblBuscaMatricula)))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(55, 55, 55)
+                .addGap(29, 29, 29)
                 .addComponent(lblConsuta)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblBuscaMatricula)
+                .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMatricula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConsultar))
-                .addGap(26, 26, 26)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addGap(32, 32, 32)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(79, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
+        DefaultTableModel modelo = (DefaultTableModel) TableAlumnos.getModel();
+        modelo.setRowCount(0);
+        ClienteWS peticionHTTP = new ClienteWS();
+        try {
+            // Supongo que el método MetodoGetm devuelve una lista de objetos Alumno
+            List<Alumno> alumnosConsultados = peticionHTTP.MetodoGetm(txtMatricula.getText());
+
+            // A continuación, puedes hacer lo que necesites con la lista de alumnos consultados
+            // Por ejemplo, si quieres agregarlos a la tabla, puedes hacerlo mediante el modelo de datos
+            DefaultTableModel modeloTabla = (DefaultTableModel) TableAlumnos.getModel();
+            for (Alumno alumno : alumnosConsultados) {
+                modeloTabla.addRow(new Object[]{
+                    alumno.getMatricula(),
+                    alumno.getNombre(),
+                    alumno.getaPaterno(),
+                    alumno.getaMaterno(),
+                    alumno.getEdad(),
+                    alumno.getGrupo(),
+                    alumno.getTelefono(),
+                    alumno.getCorreo(),
+                    alumno.getCuatrimestre(),
+                    alumno.getPromedio()
+                });
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(ConsulatJPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnConsultarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TableAlumnos;
     private javax.swing.JButton btnConsultar;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblBuscaMatricula;
     private javax.swing.JLabel lblConsuta;
     private javax.swing.JTextField txtMatricula;
     // End of variables declaration//GEN-END:variables

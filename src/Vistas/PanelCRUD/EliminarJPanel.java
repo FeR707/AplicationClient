@@ -5,17 +5,56 @@
  */
 package Vistas.PanelCRUD;
 
+import Clases.Alumno;
+import Clases.ClienteWS;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import org.json.JSONException;
+
 /**
  *
  * @author ReR-7
  */
 public class EliminarJPanel extends javax.swing.JPanel {
 
-    /**
-     * Creates new form EliminarJPanel
-     */
     public EliminarJPanel() {
         initComponents();
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
+        jcbMatriculas.setModel(comboBoxModel);
+
+        // Agregar un ComponentListener al JPanel
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                ObtenerRegistros();
+            }
+        });
+    }
+
+    private void ObtenerRegistros() {
+        ClienteWS peticionHTTP = new ClienteWS();
+        try {
+            // Supongo que el método MetodoConsulta devuelve una lista de objetos Alumno
+            List<Alumno> alumnosConsultados = peticionHTTP.MetodoConsulta();
+
+            // Obtener el modelo del JComboBox
+            DefaultComboBoxModel<String> comboBoxModel = (DefaultComboBoxModel<String>) jcbMatriculas.getModel();
+
+            // Limpiar el contenido actual del JComboBox
+            comboBoxModel.removeAllElements();
+
+            // Agregar las matrículas consultadas al JComboBox
+            for (Alumno alumno : alumnosConsultados) {
+                comboBoxModel.addElement(alumno.getMatricula());
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(ConsulatJPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -32,7 +71,7 @@ public class EliminarJPanel extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 51, 51));
+        setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(600, 500));
 
         lblEliminar.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
@@ -41,6 +80,11 @@ public class EliminarJPanel extends javax.swing.JPanel {
         jcbMatriculas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
@@ -50,37 +94,50 @@ public class EliminarJPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblEliminar)
-                .addGap(214, 214, 214))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(136, 136, 136)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(228, 228, 228)
-                        .addComponent(jcbMatriculas, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(201, 201, 201)
+                        .addComponent(lblEliminar))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(258, 258, 258)
-                        .addComponent(btnEliminar)))
+                        .addGap(205, 205, 205)
+                        .addComponent(jcbMatriculas, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(241, 241, 241)
+                        .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(135, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(56, 56, 56)
+                .addGap(54, 54, 54)
                 .addComponent(lblEliminar)
-                .addGap(44, 44, 44)
+                .addGap(46, 46, 46)
                 .addComponent(jLabel1)
-                .addGap(51, 51, 51)
+                .addGap(63, 63, 63)
                 .addComponent(jcbMatriculas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(64, 64, 64)
-                .addComponent(btnEliminar)
+                .addGap(51, 51, 51)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(176, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        String matriculaSeleccionada = (String) jcbMatriculas.getSelectedItem();
+        ClienteWS peticionHTTP = new ClienteWS();
+        boolean exito = peticionHTTP.MetodoDelete(matriculaSeleccionada);
+
+        if (exito) {
+            // Si el método fue exitoso (true), muestra un mensaje de éxito
+            JOptionPane.showMessageDialog(this, "El alumno con matrícula " + matriculaSeleccionada + " ha sido eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Si el método no fue exitoso (false), muestra un mensaje de error
+            JOptionPane.showMessageDialog(this, "No se pudo eliminar el alumno con matrícula " + matriculaSeleccionada + ".", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

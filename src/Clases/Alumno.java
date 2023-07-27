@@ -11,6 +11,7 @@ package Clases;
 public class Alumno {
 
     private String matricula;
+    private String nombre;
     private String aPaterno;
     private String aMaterno;
     private String edad;
@@ -19,6 +20,14 @@ public class Alumno {
     private String correo;
     private String cuatrimestre;
     private String promedio;
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
     public String getMatricula() {
         return matricula;
